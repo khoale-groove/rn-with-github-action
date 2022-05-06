@@ -1,29 +1,60 @@
-name: GitHub Actions Demo
+name: Build App
 env:
   DEFAULT_DEPLOYMENT_TARGET: Development
-  DEFAULT_FASTLANE_ACTION: deploy
+  DEFAULT_FASTLANE_ACTION: build
 
-on: 
-  push:
-    branches:
-     - master
-
-  workflow_dispatch: 
-    inputs:
-      fastlaneAction:
-        type: choice
-        description: "Fastlane action task"
-        options: 
-          - build
-          - deploy
-        default: 'build'
-        required: true
+on: push
+  # workflow_dispatch: 
+  #   inputs:
+  #     fastlaneAction:
+  #       type: choice
+  #       description: "Fastlane action task"
+  #       options: 
+  #         - build
+  #         - deploy
+  #       default: 'build'
+  #       required: true
 
 jobs:
   android-build:
     name: Android Build Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - uses: ./.github/actions/setup_node
+
+      # # this step is necessary to distribute app via Firebase
+      # - name: Install Firebase CLI
+      #   run: curl -sL https://firebase.tools | bash
+
+      # # this step is necessary to install bundle
+      # - name: Set up Ruby
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     ruby-version: 3.1.2 # Not needed with a .ruby-version file
+
+      # - name: Caching ruby dependencies
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: 'vendor/bundle'
+      #     key: ${{ runner.os }}-gems-${{ hashFiles('**/android/Gemfile.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-gems-
+          
+      # - name: Install bundle dependencies
+      #   run: |
+      #     cd android
+      #     bundle install
+      
+      # - name: Run Fastlane
+      #   env:
+      #     PLATFORM: Android
+      #     FASTLANE_ACTION: ${{ github.event.inputs.fastlaneAction || env.DEFAULT_FASTLANE_ACTION}}
+      #     FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
+      #     SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+      #     SLACK_URL: ${{ secrets.SLACK_URL }}
+      #   run: |
+      #     bash ./.build-scripts/build_app.sh
+
     
